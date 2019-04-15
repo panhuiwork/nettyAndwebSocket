@@ -256,6 +256,8 @@ public class NettyAndwebSocketApplication  implements CommandLineRunner{
 	}
 
 }
+
+application.yml
 netty:
   port: 7000
   url: localhost
