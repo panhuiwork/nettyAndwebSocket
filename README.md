@@ -1,4 +1,5 @@
 # nettyAndwebSocket
+基于springboot开发netty.
 
 前端websocket
 <!DOCTYPE html>
