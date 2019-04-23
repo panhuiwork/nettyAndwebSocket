@@ -13,11 +13,7 @@ import com.geral.netty.config.NettyServer;
 @SpringBootApplication
 //http://localhost:8080/index.html
 public class NettyAndwebSocketApplication  implements CommandLineRunner{
-	@Value("${netty.port}")
-	private int port;
 
-	@Value("${netty.url}")
-	private String url;
 	@Autowired
 	private NettyServer server;
 
@@ -27,9 +23,7 @@ public class NettyAndwebSocketApplication  implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		InetSocketAddress address = new InetSocketAddress(url, port);
-		System.out.println("run  .... . ... " + url);
-		server.start(address);
+		server.start();
 	}
 
 }

@@ -1,3 +1,12 @@
 netty:
   port: 7000
   url: localhost
+spring:
+  rabbitmq:
+    host: 192.168.0.19
+    username: guest
+    password: guest
+    port: 5672
+    publisher-confirms: true
+  application:
+    name: rabbitmqtest

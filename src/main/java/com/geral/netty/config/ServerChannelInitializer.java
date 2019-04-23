@@ -1,37 +1,47 @@
 package com.geral.netty.config;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
 
 public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 	@Override
 	protected void initChannel(SocketChannel channel) throws Exception {
 //        channel.pipeline().addLast("decoder",new StringDecoder(CharsetUtil.UTF_8));
-//        channel.pipeline().addLast("encoder",new StringEncoder(CharsetUtil.UTF_8));
 		// websocket需要添加这个处理
-
 		ChannelPipeline channelPipeline = channel.pipeline();
+
+		// 关于粘包问题处理
+//		ByteBuf buf = Unpooled.copiedBuffer("&".getBytes());
+//		channelPipeline.addLast(new DelimiterBasedFrameDecoder(1024,buf));
+
 		// 添加相应的助手类与处理器
 		/**
 		 * WebSokect基于Http，所以要有相应的Http编解码器，HttpServerCodec()
 		 */
-		channelPipeline.addLast(new HttpServerCodec());
+//		channelPipeline.addLast(new HttpServerCodec());
+		channelPipeline.addLast("http-codec", new HttpServerCodec()); // Http消息编码解码
+		channelPipeline.addLast("aggregator", new HttpObjectAggregator(2048 * 64)); // Http消息组装
+		channelPipeline.addLast("http-chunked", new ChunkedWriteHandler()); // WebSocket通信支持
 
 		// 在Http中有一些数据流的传输，那么数据流有大有小，如果说有一些相应的大数据流处理的话，需要在此添加
 		// ChunkedWriteHandler：为一些大数据流添加支持
-		channelPipeline.addLast(new ChunkedWriteHandler());
+//		channelPipeline.addLast(new ChunkedWriteHandler());
 
 		// UdineHttpMessage进行处理，也就是会用到request以及response
 		// HttpObjectAggregator：聚合器，聚合了FullHTTPRequest、FullHTTPResponse。。。，当你不想去管一些HttpMessage的时候，直接把这个handler丢到管道中，让Netty自行处理即可
-		channelPipeline.addLast(new HttpObjectAggregator(2048 * 64));
+//		channelPipeline.addLast(new HttpObjectAggregator(2048 * 64));
 
 		// ================华丽的分割线：以上是用于支持Http协议================
 		// ================华丽的分割线：以下是用于支持WebSoket==================
@@ -44,5 +54,6 @@ public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> 
 
 		// 添加自动handler，读取客户端消息并进行处理，处理完毕之后将相应信息传输给对应客户端
 		channelPipeline.addLast(new ServerHandler());
+
 	}
 }
