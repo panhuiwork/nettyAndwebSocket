@@ -53,7 +53,6 @@ public class ServerHandler extends SimpleChannelInboundHandler<TextWebSocketFram
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
-		System.out.println("============1===========");
 		//如果存在channelRead 就不会走这个方法
 		String content = msg.text();
 		System.out.println("客户端传输的数据：" + content);
